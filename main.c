@@ -7,6 +7,23 @@
 char lines[MAX_LINES][MAX_LENGTH];
 int lineCount = 0;
 
+/* Read an integer safely */
+int readInteger()
+{
+    char input[50];
+    int number;
+
+    fgets(input, sizeof(input), stdin);
+
+    if (sscanf(input, "%d", &number) != 1)
+    {
+        return -1;
+    }
+
+    return number;
+}
+
+/* Display document */
 void displayDocument()
 {
     if (lineCount == 0)
@@ -25,14 +42,14 @@ void displayDocument()
     printf("----------------------------\n");
 }
 
+/* Insert a line */
 void insertLine()
 {
     int lineNumber;
     char text[MAX_LENGTH];
 
     printf("Enter line number: ");
-    scanf("%d", &lineNumber);
-    getchar();
+    lineNumber = readInteger();
 
     if (lineNumber < 1 || lineNumber > lineCount + 1)
     {
@@ -57,11 +74,13 @@ void insertLine()
     }
 
     strcpy(lines[lineNumber - 1], text);
+
     lineCount++;
 
     printf("[SUCCESS] Line inserted.\n");
 }
 
+/* Delete a line */
 void deleteLine()
 {
     int lineNumber;
@@ -73,8 +92,7 @@ void deleteLine()
     }
 
     printf("Enter line number to delete: ");
-    scanf("%d", &lineNumber);
-    getchar();
+    lineNumber = readInteger();
 
     if (lineNumber < 1 || lineNumber > lineCount)
     {
@@ -92,13 +110,22 @@ void deleteLine()
     printf("[SUCCESS] Line deleted.\n");
 }
 
+/* Save document */
 void saveFile()
 {
     char filename[100];
     FILE *file;
 
     printf("Enter file name: ");
-    scanf("%99s", filename);
+    fgets(filename, sizeof(filename), stdin);
+
+    filename[strcspn(filename, "\n")] = '\0';
+
+    if (strlen(filename) == 0)
+    {
+        printf("[ERROR] File name cannot be empty.\n");
+        return;
+    }
 
     file = fopen(filename, "w");
 
@@ -118,13 +145,22 @@ void saveFile()
     printf("[SUCCESS] File saved.\n");
 }
 
+/* Load document */
 void loadFile()
 {
     char filename[100];
     FILE *file;
 
     printf("Enter file name: ");
-    scanf("%99s", filename);
+    fgets(filename, sizeof(filename), stdin);
+
+    filename[strcspn(filename, "\n")] = '\0';
+
+    if (strlen(filename) == 0)
+    {
+        printf("[ERROR] File name cannot be empty.\n");
+        return;
+    }
 
     file = fopen(filename, "r");
 
@@ -148,6 +184,7 @@ void loadFile()
     printf("[SUCCESS] File loaded.\n");
 }
 
+/* Search text */
 void searchText()
 {
     char search[MAX_LENGTH];
@@ -179,6 +216,7 @@ void searchText()
     }
 }
 
+/* Display help */
 void showHelp()
 {
     printf("\n========== HELP ==========\n");
@@ -202,7 +240,7 @@ void showHelp()
     printf("   Find a word or phrase in the document.\n\n");
 
     printf("7. Help\n");
-    printf("   Show this help information.\n\n");
+    printf("   Show help information.\n\n");
 
     printf("8. Exit\n");
     printf("   Close the line editor.\n");
@@ -210,6 +248,7 @@ void showHelp()
     printf("==========================\n");
 }
 
+/* Main function */
 int main()
 {
     int choice;
@@ -230,8 +269,7 @@ int main()
         printf("8. Exit\n");
 
         printf("\nEnter your choice: ");
-        scanf("%d", &choice);
-        getchar();
+        choice = readInteger();
 
         switch (choice)
         {
@@ -268,7 +306,7 @@ int main()
                 return 0;
 
             default:
-                printf("\n[ERROR] Invalid choice.\n");
+                printf("\n[ERROR] Invalid choice. Please enter 1-8.\n");
         }
     }
 
